@@ -1,0 +1,60 @@
+jose angel herrera hernadez 
+punto fijo
+# -*- coding: utf-8 -*-
+"""
+Método de Punto Fijo
+"""
+
+import math
+
+def punto_fijo(g, x0, tolerancia=1e-6, max_iter=100):
+    iteraciones = []
+
+    for i in range(1, max_iter + 1):
+        x1 = g(x0)
+
+        # Error en decimales
+        error = abs(x1 - x0)
+
+        iteraciones.append({
+            "iter": i,
+            "x0": x0,
+            "x1": x1,
+            "error": error
+        })
+
+        # Condición de paro
+        if error < tolerancia:
+            return x1, iteraciones
+
+        x0 = x1
+
+    return x1, iteraciones
+
+
+# 🔹 Crear función g(x)
+def crear_funcion(expr):
+    return lambda x: eval(expr, {"x": x, "math": math})
+
+
+# 🔹 Entrada de datos
+expr = input("Ingresa g(x) (ej: math.sqrt((10 - x**3)/4)): ")
+x0 = float(input("Ingresa x0: "))
+tol = float(input("Tolerancia (ej: 0.001): "))
+max_iter = int(input("Máx. iteraciones (ej: 100): "))
+
+g = crear_funcion(expr)
+
+# 🔹 Ejecutar método
+raiz, pasos = punto_fijo(g, x0, tol, max_iter)
+
+# 🔹 Mostrar resultados
+if pasos:
+    print("\n📊 Iteraciones:")
+    print("Iter |    x0     |    x1     |   Error")
+    print("-"*50)
+
+    for paso in pasos:
+        print(f"{paso['iter']:>4} | {paso['x0']:.6f} | {paso['x1']:.6f} | {paso['error']:.6f}")
+
+    print("\n✅ Raíz aproximada:", round(raiz, 6))
