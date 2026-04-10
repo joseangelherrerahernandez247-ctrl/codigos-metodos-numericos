@@ -1,0 +1,84 @@
+jose angel herrera hernandez 
+codigo falsa posicion
+# -*- coding: utf-8 -*-
+"""
+Falsa Posición mejorado (con x0 y x1)
+"""
+
+import math
+
+def falsa_posicion(f, x0, x1, tolerancia=1e-6, max_iter=100):
+    if f(x0) * f(x1) >= 0:
+        print("❌ No hay cambio de signo en el intervalo.")
+        return None, []
+
+    iteraciones = []
+    xr_anterior = None
+
+    for i in range(1, max_iter + 1):
+        fx0 = f(x0)
+        fx1 = f(x1)
+
+        # Fórmula de falsa posición
+        xr = x1 - (fx1 * (x0 - x1)) / (fx0 - fx1)
+        fxr = f(xr)
+
+        # Error en decimales
+        if xr_anterior is not None:
+            error = abs(xr - xr_anterior)
+        else:
+            error = None
+
+        # Guardar datos
+        iteraciones.append({
+            "iter": i,
+            "x0": x0,
+            "x1": x1,
+            "xr": xr,
+            "f(xr)": fxr,
+            "error": error
+        })
+
+        # Condición de paro
+        if error is not None and error < tolerancia:
+            return xr, iteraciones
+
+        # Actualizar intervalo
+        if fx0 * fxr < 0:
+            x1 = xr
+        else:
+            x0 = xr
+
+        xr_anterior = xr
+
+    return xr, iteraciones
+
+
+# 🔹 Crear función desde texto
+def crear_funcion(expr):
+    return lambda x: eval(expr, {"x": x, "math": math})
+
+
+# 🔹 Entrada de datos
+expr = input("Ingresa la función (ej: x**3 + 4*x**2 - 10): ")
+x0 = float(input("Ingresa x0: "))
+x1 = float(input("Ingresa x1: "))
+tol = float(input("Tolerancia (ej: 0.001): "))
+max_iter = int(input("Máx. iteraciones (ej: 100): "))
+
+f = crear_funcion(expr)
+
+# 🔹 Ejecutar método
+raiz, pasos = falsa_posicion(f, x0, x1, tol, max_iter)
+
+# 🔹 Mostrar resultados
+if pasos:
+    print("\n📊 Iteraciones:")
+    print("Iter |    x0     |    x1     |    xr     |   f(xr)   |   Error")
+    print("-"*70)
+
+    for paso in pasos:
+        error_str = f"{paso['error']:.6f}" if paso['error'] is not None else "-----"
+        print(f"{paso['iter']:>4} | {paso['x0']:.6f} | {paso['x1']:.6f} | {paso['xr']:.6f} | {paso['f(xr)']:.6f} | {error_str}")
+
+    print("\n✅ Raíz aproximada:", round(raiz, 6))
