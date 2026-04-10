@@ -1,0 +1,81 @@
+jose angel herrera hernadez 
+codigo de newton-rompsoh
+# -*- coding: utf-8 -*-
+"""
+Newton-Raphson usando x0 y x1 (derivada aproximada)
+"""
+
+import math
+
+def newton_modificado(f, x0, x1, tolerancia=1e-6, max_iter=100):
+    iteraciones = []
+
+    for i in range(1, max_iter + 1):
+        fx0 = f(x0)
+        fx1 = f(x1)
+
+        # Aproximación de la derivada
+        if (x1 - x0) == 0:
+            print("❌ División entre cero.")
+            return None, iteraciones
+
+        dfx = (fx1 - fx0) / (x1 - x0)
+
+        if dfx == 0:
+            print("❌ Derivada cero.")
+            return None, iteraciones
+
+        # Fórmula de Newton
+        xr = x0 - fx0 / dfx
+
+        # Error en decimales
+        error = abs(xr - x0)
+
+        # Guardar datos
+        iteraciones.append({
+            "iter": i,
+            "x0": x0,
+            "x1": x1,
+            "xr": xr,
+            "f(xr)": f(xr),
+            "error": error
+        })
+
+        # Condición de paro
+        if error < tolerancia:
+            return xr, iteraciones
+
+        # Actualizar valores
+        x1 = x0
+        x0 = xr
+
+    return xr, iteraciones
+
+
+# 🔹 Crear función desde texto
+def crear_funcion(expr):
+    return lambda x: eval(expr, {"x": x, "math": math})
+
+
+# 🔹 Entrada de datos
+expr = input("Ingresa la función (ej: x**3 + 4*x**2 - 10): ")
+x0 = float(input("Ingresa x0: "))
+x1 = float(input("Ingresa x1: "))
+tol = float(input("Tolerancia (ej: 0.001): "))
+max_iter = int(input("Máx. iteraciones (ej: 100): "))
+
+f = crear_funcion(expr)
+
+# 🔹 Ejecutar método
+raiz, pasos = newton_modificado(f, x0, x1, tol, max_iter)
+
+# 🔹 Mostrar resultados
+if pasos:
+    print("\n📊 Iteraciones:")
+    print("Iter |    x0     |    x1     |    xr     |   f(xr)   |   Error")
+    print("-"*75)
+
+    for paso in pasos:
+        print(f"{paso['iter']:>4} | {paso['x0']:.6f} | {paso['x1']:.6f} | {paso['xr']:.6f} | {paso['f(xr)']:.6f} | {paso['error']:.6f}")
+
+    print("\n✅ Raíz aproximada:", round(raiz, 6))
